@@ -16,7 +16,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Fprintln(conn, "Oi pessoal do #devincachu!")
+		fmt.Fprintln(conn, "Oi pessoal!")
 		conn.Close()
 	}
 }
