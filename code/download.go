@@ -14,6 +14,7 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -54,24 +55,22 @@ func extract(url string, files chan<- string) error {
 
 func download(files <-chan string, wg *sync.WaitGroup) {
 	defer wg.Done() // HL
-	for file := range files { // HL
-		resp, err := http.Get(url + file)
+	var caminho string
+	for file := range files {
+		caminho = url + file
+		resp, err := http.Get(caminho)
 		if err != nil {
-			log.Printf("Failed to download %q: %s.", file, err)
+			fmt.Println("Arquivo", caminho, "com erro de abertura")
 			continue
 		}
-		p := path.Join(dstdir, file)
-		f, err := os.Create(p)
+		open, err := os.Create(path.Join(dstdir, file))
 		if err != nil {
-			log.Printf("Failed to open %q: %s.", p, err)
+			fmt.Println("Falhou ao abrir arquivo", err)
 			continue
 		}
-		_, err = io.Copy(f, resp.Body) // HL
+		io.Copy(open, resp.Body)
+		open.Close()
 		resp.Body.Close()
-		f.Close()
-		if err != nil {
-			log.Printf("Failed to write %q: %s.", p, err)
-		}
 	}
 }
 
